@@ -48,6 +48,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <boost/shared_ptr.hpp>
+#include <tf/transform_listener.h>
 
 namespace robot_navigation
 {
@@ -74,7 +75,7 @@ namespace robot_navigation
       virtual bool makePlan(
         const geometry_msgs::PoseStamped& start, 
         const geometry_msgs::PoseStamped& goal,
-        const double tolerance, 
+        const double& tolerance, 
         std::vector<geometry_msgs::PoseStamped>& plan,
         double& cost) = 0;
 
@@ -82,14 +83,15 @@ namespace robot_navigation
       /**
        * @brief  Initialization function for the BaseGlobalPlanner
        * @param  name The name of this planner
+       * @param  global_frame The global frame name
        */
-      virtual void initialize(std::string name) = 0;
+      virtual void initialize(const std::string& name, const boost::shared_ptr<tf::TransformListener>& tf_listener_ptr, const std::string& global_frame) = 0;
 
     protected:
       /**
        * @brief  Constructor
        */
-      BaseGlobalPlanner();
+      BaseGlobalPlanner(){};
   };
 } /* namespace robot_navigation */
 

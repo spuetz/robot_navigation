@@ -61,6 +61,7 @@ namespace robot_navigation{
     private_nh.param("robot_base_frame", robot_frame_, std::string("base_link"));
     private_nh.param("global_frame", global_frame_, std::string("map"));
     private_nh.param("moving_frequency", moving_frequency, 100);
+    private_nh.param("tf_timeout", tf_timeout_, 1.0);
 
   if(moving_frequency < 1){
     ROS_WARN("The moving frequency must be greater or equal one!");
@@ -68,6 +69,7 @@ namespace robot_navigation{
   }
 
     // try to load and init local planner
+    ROS_INFO("Load local planner plugin.");
     try{
       local_planner_ = class_loader_local_planner_.createInstance(local_planner_plugin_name);
       local_planner_-> initialize(class_loader_local_planner_.getName(local_planner_plugin_name));
@@ -75,6 +77,8 @@ namespace robot_navigation{
       ROS_FATAL("Failed to create the %s local planner, are you sure it is properly registered and that the containing library is built? Exception: %s", local_planner_plugin_name.c_str(), ex.what());
       exit(1);
     }
+    ROS_INFO("Local planner plugin loaded.");
+
 
     // init cmd_vel publisher for the robot velocity command
     vel_pub_ = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
@@ -158,7 +162,7 @@ namespace robot_navigation{
         }else{
           geometry_msgs::Twist cmd_vel;
           geometry_msgs::PoseStamped robot_pose;
-          robot_navigation_state::getRobotPose(tf_listener, robot_frame_, global_frame_, robot_pose);
+          robot_navigation_state::getRobotPose(tf_listener, robot_frame_, global_frame_, ros::Duration(tf_timeout_), robot_pose);
           if(local_planner_->computeVelocityCommands(robot_pose, cmd_vel)){
             setState(robot_navigation_state::moving::GOT_LOCAL_CMD);
             vel_pub_.publish(cmd_vel);

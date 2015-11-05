@@ -60,7 +60,7 @@ namespace robot_navigation{
   class RobotNavigationController{
     public:
       
-      RobotNavigationController();
+      RobotNavigationController(const boost::shared_ptr<tf::TransformListener>& tf_listener_ptr);
       
       ~RobotNavigationController();
       
@@ -75,6 +75,11 @@ namespace robot_navigation{
       bool isControllerRunning();
         
     protected:
+    
+	  void publishPath(std::vector<geometry_msgs::PoseStamped>& plan);
+	  
+      bool transformPlanToGlobalFrame(std::vector<geometry_msgs::PoseStamped>& plan, std::vector<geometry_msgs::PoseStamped>& global_plan);
+
     
     private:
     
@@ -108,11 +113,17 @@ namespace robot_navigation{
       std::string robot_frame_;
       std::string global_frame_;
 
-      tf::TransformListener tf_listener_;
+      const boost::shared_ptr<tf::TransformListener> tf_listener_ptr_;
       
       double goal_tolerance_;
       
       bool controller_is_running_;
+      
+      ros::Publisher path_pub_;
+      ros::Publisher marker_pub_;
+      ros::Publisher pose_array_pub_;
+      
+      double tf_timeout_;
 };
 
 } /* namespace robot_navigation */

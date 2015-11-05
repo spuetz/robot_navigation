@@ -100,7 +100,8 @@ class RobotNavigation{
     dynamic_reconfigure::Server<robot_navigation::RobotNavigationConfig>*
       dynamic_reconfigure_server_;
       
-    RobotNavigationController controller_;
+    boost::shared_ptr<RobotNavigationController> controller_ptr_;
+    boost::shared_ptr<tf::TransformListener> tf_listener_ptr_;
 };
 }
 

@@ -118,6 +118,8 @@ namespace robot_navigation{
       tf::TransformListener tf_listener;
       
       robot_navigation_state::moving::Input state_;
+      
+      double tf_timeout_;
 
 };
 

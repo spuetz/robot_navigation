@@ -59,7 +59,7 @@ namespace robot_navigation{
   class RobotNavigationPlanning{
     public:
       
-      RobotNavigationPlanning(boost::condition_variable& condition);
+      RobotNavigationPlanning(boost::condition_variable& condition, const boost::shared_ptr<tf::TransformListener>& tf_listener);
       
       ~RobotNavigationPlanning();
       
@@ -114,7 +114,7 @@ namespace robot_navigation{
       std::string robot_frame_;
       std::string global_frame_;
 
-      tf::TransformListener tf_listener;
+      const boost::shared_ptr<tf::TransformListener> tf_listener_ptr_;
       
       robot_navigation_state::planning::Input state_;
 

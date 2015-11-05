@@ -46,8 +46,8 @@
 
 namespace robot_navigation{
 
-  RobotNavigationPlanning::RobotNavigationPlanning(boost::condition_variable& condition)
-    : condition_(condition),
+  RobotNavigationPlanning::RobotNavigationPlanning(boost::condition_variable& condition, const boost::shared_ptr<tf::TransformListener>& tf_listener_ptr)
+    : condition_(condition), tf_listener_ptr_(tf_listener_ptr),
       class_loader_global_planner_("robot_navigation", "robot_navigation::BaseGlobalPlanner"),
       state_(robot_navigation_state::planning::STOPPED)
 
@@ -61,13 +61,15 @@ namespace robot_navigation{
     private_nh.param("global_frame", global_frame_, std::string("map"));
 
     // try to load and init global planner
+    ROS_INFO("Load global planner plugin.");
     try{
       global_planner_ = class_loader_global_planner_.createInstance(global_planner_plugin_name);
-      global_planner_-> initialize(class_loader_global_planner_.getName(global_planner_plugin_name));
+      global_planner_-> initialize(class_loader_global_planner_.getName(global_planner_plugin_name), tf_listener_ptr_, global_frame_);
     }catch(const pluginlib::PluginlibException& ex){
       ROS_FATAL("Failed to create the %s global planner, are you sure it is properly registered and that the containing library is built? Exception: %s", global_planner_plugin_name.c_str(), ex.what());
       exit(1);
     }
+    ROS_INFO("Global planner plugin loaded.");
 
     // set the calling duration by the planning frequency
     //planning_timeout_ = boost::chrono::microseconds( (int) (1e6 / planning_freque) );

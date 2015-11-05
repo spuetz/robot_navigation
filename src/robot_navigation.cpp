@@ -44,6 +44,7 @@
 
 
 #include "robot_navigation/robot_navigation.h"
+#include <tf/transform_listener.h>
 
 namespace robot_navigation{
 
@@ -61,6 +62,9 @@ RobotNavigation::RobotNavigation()
     this
   );
 
+  tf_listener_ptr_ = boost::shared_ptr<tf::TransformListener>(new tf::TransformListener(nh, ros::Duration(30), true));
+  controller_ptr_ = boost::shared_ptr<RobotNavigationController>(new RobotNavigationController(tf_listener_ptr_));
+
   // set up dynamic_reconfigure server
   dynamic_reconfigure_server_ = 
     new dynamic_reconfigure::Server<robot_navigation::RobotNavigationConfig>(
@@ -76,9 +80,9 @@ void RobotNavigation::reconfigureCallback(robot_navigation::RobotNavigationConfi
 }
 
 void RobotNavigation::goalCallback(const geometry_msgs::PoseStamped::ConstPtr& goal){
-  controller_.setNewGoal(*goal);
-  if(!controller_.isControllerRunning()){
-	controller_.startController();
+  controller_ptr_->setNewGoal(*goal);
+  if(!controller_ptr_->isControllerRunning()){
+	controller_ptr_->startController();
   }
 }
 

@@ -8,6 +8,8 @@ set( ROBOT_NAVIGATION_PKG_DEPENDS
   geometry_msgs
   dynamic_reconfigure
   robot_navigation_state
+  nav_msgs
+  visualization_msgs
 )
 
 find_package(catkin REQUIRED COMPONENTS ${ROBOT_NAVIGATION_PKG_DEPENDS})
